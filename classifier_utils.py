@@ -1,3 +1,6 @@
+#This file contains redundant functions with Model testing.ipynb, but I wrote it to work better with my end of project workflow,
+#which was in another notebook (Final Model tuning), and exclusively uses XGBoost
+
 import pandas as pd
 
 import numpy as np
@@ -20,8 +23,18 @@ import xgboost as xgb
 from sklearn.model_selection import train_test_split, cross_validate, GridSearchCV, KFold
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, \
                             recall_score, roc_auc_score, roc_curve, classification_report
-
+""""""
 def plot_roc_curve(classifier, df , features, target='disposition_num', xgb = True, title=''):
+    """
+    Plot ROC curve and output ROC_AUC metric for an sklearn or XGBoost model on a validation set
+
+    Args:
+    classifier: sklearn model or something that similar that can be used by cross_validate
+    df: pandas dataframe that contains all training/validation data
+    features: list of strings representing the columns in df to use as features
+    target: string for name of column to use as target (y)
+    xgb: Use True if model is an XGBoost classifier - passes fit with extra parameters to ensure fast fitting
+    """
     X = df[features]
     y = df[target]
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = .25, random_state=1)
@@ -52,6 +65,17 @@ def plot_roc_curve(classifier, df , features, target='disposition_num', xgb = Tr
 
 
 def plot_confusion_matrix(classifier, df, features, target='disposition_num', xgb = True, title=''):
+    """
+    Print classification report and graph confusion matrix for an sklearn or XGBoost model on a
+    validation set
+
+    Args:
+    classifier: sklearn model or something that similar that can be used by cross_validate
+    df: pandas dataframe that contains all training/validation data
+    features: list of strings representing the columns in df to use as features
+    target: string for name of column to use as target (y)
+    xgb: Use True if model is an XGBoost classifier - passes fit with extra parameters to ensure fast fitting
+    """
     X = df[features]
     y = df[target]
     X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = .25, random_state=1)
@@ -86,6 +110,17 @@ def plot_confusion_matrix(classifier, df, features, target='disposition_num', xg
     plt.show()
 
 def xgb_test_model_CV(classifier, df, features, target='disposition_num', preprocessor = None):
+    """
+    Report cross validation results for an XGBoost model across several metrics
+
+    Args:
+    classifier: sklearn model or something that similar that can be used by cross_validate
+    df: pandas dataframe that contains all training/validation data
+    features: list of strings representing the columns in df to use as features
+    target: string for name of column to use as target (y)
+    preprocessor: Object implementing sklearn fit_transform signature for transforming data before fitting (StandardScaler, PolynomialFeatures, etc.)
+
+    """
     X = np.array(df[features])
     y = np.array(df[target])
     if preprocessor:
