@@ -3,31 +3,33 @@
 
 ## Description
 
-The goal of this project is to find what factors contribute to a board game's success using linear regression techniques. This success is measured by two metrics: the number of plays the game has recieved and its average rating (out of 10), both from [BoardGameGeek](https://boardgamegeek.com/). The featuers used in the linear regression model include things that a board game maker could control, such as the number of players, the game's complexity, and categorical data (whether a game is a fantasy game, card game, etc.). Scikit-learn's PolynomialFeature was also used to generate interaction features. The final model used Lasso regression in order to cut down the total number of features used in the model.
+This project aimed to classify objects of interest catalogued by the Kepler Space Telescope as a Candidate exoplanet or as a False Positive (i.e. an observation that caught the telescopes attention, but was not an exoplanet). For more information on exoplanets and the Kepler Space Telescope, see the [NASA page](https://www.nasa.gov/mission_pages/kepler/overview/index.html) and [Wikipedia entry](https://en.wikipedia.org/wiki/Kepler_space_telescope) on the topic. In short, the goal of this project was to emulate the step in the planet search/verification process wherein a team of scientists decided if an observation should move forward and be verified through other means (such as a ground based telescope).
 
-The final model achieved an R^2 of 0.49 and 0.27 on the rating and number of plays models, respectively. Interestingly, the most impactful features differed greatly between the models. The most predictive features of the rating model were mostly continuous variables, those of the number of plays model were mostly categorical (see below.)
+A wide variety of models were tested, but ultimately an XGBoost classifier was used as it gave the best overall performance, with a focus on recall, out of all the models tested. This project focused on recall because it would be better to have to comb through a few extra false positives than miss a potential major discovery (such as a potentially habitable, Earth-like exoplanet). After all, grad students' time is cheap.
 
-![graph1](https://github.com/nathaniel-speiser/Boardgame-regression/blob/main/pics/rating%20coefficients.png)
-![graph2](https://github.com/nathaniel-speiser/Boardgame-regression/blob/main/pics/logplays%20coefficients.png)
+The final model achieved a recall of 91% on a held-out test set and an accuracy of 89%. The metric it actually performs best on is ROC area under the curve, with a score of 96%. These scores together suggest the model is fairly good at identifying candidate exoplanets and is especially good at separating the two classes, evidenced by the high ROC AUC score.
+
+To explore the data and the results, I have created a [Tableau dashboard](https://public.tableau.com/views/Keplertelescopevisualization/Dashboard1?:language=en&:display_count=y&publish=yes&:origin=viz_share_link) that shows the location of the observations in space and some of their important properties.
 
 ## Data
 
-All data was scraped from [Boardgamegeek.com](https://boardgamegeek.com/). Most of the data was scraped directly from the board games' pages, but marketplace data was found using Boardgamegeeks [xmlapi2](https://boardgamegeek.com/wiki/page/BGG_XML_API2#).
+The data used in the project was downloaded directly from the [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=cumulative). The table contains roughly 10,000 objects of interest that were reviewed by scientists, more than 2000 of which have gone on to be verified as exoplanets, with verification still pending on another 2500 or so. The table contains fit parameters from fits of the light curves of stars as planets potentially pass in front of them. These fit parameters are properties of the planet, star, and transit, as well as the size of the error on those fits for many of those features. The table also contains categorical and other information that was not relevant to the fitting process.
 
 ## Tools
 
-* BeautifulSoup
-* numpy
 * pandas
+* numpy
 * scikit-learn
+* XGBoost
 * matplotlib
 * seaborn
+* ipywidgets (highly recommended for EDA!)
 
 
 ## Impacts
 
-This project could be use as a reference for board game makers seeking to maximize their upcoming board game's popularity, or to predict the popularity of a board game during the early stages of development (see the last page of the presentation PDF for an example). It should be noted that this project is limited in scope to the popularity of board games among presumed enthusiasts, rather than the general public
+It should first be said that this model is *absolutely not a replacement for the planet verification process*. Given that it emulates human classification of exoplanet candidates fairly well, it could replace the human verification step of the planet finding process, though given the scienitfic importance of this work it may not be desireable to take humans out of the process completely. More realistically, it could be used to optimize the planet finding process. For missions where much more data is coming in and time is limited, it could be used to prioritize which observations are looked at by humans first, or to prioritize the order in which planets should be verified by ground telescopes or other methods.
 
 ## Future directions
 
-Given the models' performance, there is likely still room for improvement in model and feature selection. Better marketplace data would also be highly desireable, as price data for many games is most likely inaccurate given it came from a marketplace, not direcly from the publisher or supplier. Finally I would like to make the model more interactive so it is easier to make predictions on fictional games.
+A model based on the raw light curves would most likely be able to create more advanced features and perform better, though the signal processing that would be involved would much more complex than the work done in this project. The model could also incorporate features that humans use to classify the observations as exoplanet candidates (described in [this paper](https://arxiv.org/abs/1202.5852)) in order to perform better and/or be more interpretable.
